@@ -1,27 +1,32 @@
-name: Deploy master
+name: Java CI with Maven
+
 on:
-  push:
-    branches:
-    - master
+   push:
+     branches: 
+            - master
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
+   build:
 
-    - name: Checkout source code
-      uses: actions/checkout@v2
+     runs-on: ubuntu-latest
 
-    - name: Generate deployment package
-      run: zip -r deploy.zip . -x '*.git*'
-
-    - name: Deploy to EB
-      uses: einaregilsson/beanstalk-deploy@v20
-      with:
-        aws_access_key: ${{ secrets.MY_AWS_ACCESS_KEY }}
-        aws_secret_key: ${{ secrets.MY_AWS_SECRET_KEY }}
-        application_name: github-ci-cd
-        environment_name: Githubcicd-env
-        version_label: 1234
-        region: eu-central-1
-        deployment_package: deploy.zip
+     steps:
+     - uses: actions/checkout@v3
+     - name: Set up JDK 
+       uses: actions/setup-java@v3
+       with:
+         java-version: '17.0.2'
+         distribution: 'temurin'
+         cache: maven
+     - name: Build with Maven
+       run: mvn -B package --file pom.xml
+     - name: Deploy to EB
+       uses: einaregilsson/beanstalk-deploy@v13
+       with:
+         aws_access_key: ${{ secrets.MY_AWS_ACCESS_KEY }}
+         aws_secret_key: ${{ secrets.MY_AWS_SECRET_KEY }}
+         application_name: spring-security-mvs
+         environment_name: Springsecuritymvs-env
+         version_label: ${{github.SHA}}
+         region: eu-central-1
+         deployment_package: target/
