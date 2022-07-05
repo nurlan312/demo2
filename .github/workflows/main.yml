@@ -27,6 +27,6 @@ jobs:
          aws_secret_key: ${{ secrets.MY_AWS_SECRET_KEY }}
          application_name: spring-security-mvs
          environment_name: Springsecuritymvs-env
-         version_label: ${{github.SHA}}
+         version_label: ${{ github.SHA }}
          region: eu-central-1
          deployment_package: target/demo2
